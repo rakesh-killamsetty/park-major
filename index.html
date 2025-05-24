@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parkinson's Disease Assessment Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome for Icons -->
+
+</head>
+<body>
+    <div class="container">
+        <div id="home" class="section active">
+            <h1 class="title">Parkinson's Disease Assessment & Health Recommendations</h1>
+
+            <div class="cards-container">
+                <!-- Voice Analysis Card -->
+                <div class="card">
+                    <img src="https://images.unsplash.com/vector-1741097263402-5da1a03b5c5e?q=80&w=2360&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+                         alt="Voice Analysis" 
+                         class="card-image">
+                    <div class="card-content">
+                        <h2>Voice Analysis</h2>
+                        <p>Record or upload your voice for Parkinson's assessment</p>
+                        <p>preferred for general check</p>
+                        <button onclick="showVoiceAnalysis()" class="button">
+                            <span class="icon">🎤</span>
+                            Start Voice Analysis
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Health Assessment Card -->
+                <div class="card">
+                    <img src="https://images.unsplash.com/vector-1739112852224-1835510b8b14?q=80&w=2360&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+                         alt="Health Assessment" 
+                         class="card-image">
+                    <div class="card-content">
+                        <h2>Analysis using smartwatch parameters</h2>
+                        <p>Enter your daily smartwatch-tracked parameters</p>
+                        <p>preferred for moderate level assessment</p>
+                        <button onclick="showHealthForm()" class="button">
+                            <span class="icon">🏥</span>
+                            Start Health Assessment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voice Analysis Section -->
+        <div id="voiceAnalysis" class="section">
+            <button onclick="goBack()" class="back-button">← Back</button>
+            <h2>Voice Analysis</h2>
+            <div class="recorder-container">
+                <button id="recordButton" class="button">Start Recording</button>
+                <div class="upload-container">
+                    <input type="file" id="audioUpload" accept="audio/*" class="file-input">
+                    <label for="audioUpload" class="button outline">Upload Audio</label>
+                </div>
+                <div id="recordingProgress" class="progress-bar hidden">
+                    <div class="progress-fill"></div>
+                </div>
+                <div id="audioPreview" class="hidden">
+                    <audio id="audioPlayer" controls class="mt-4"></audio>
+                    <button id="submitRecording" class="button mt-4">Submit Recording</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Form Section -->
+        <div id="healthForm" class="section">
+            <button onclick="goBack()" class="back-button">← Back</button>
+            <h2>Health Assessment Form</h2>
+            <form id="healthAssessmentForm" class="form">
+                <div class="form-group">
+                    <label for="age">Age (Ex: 35)</label>
+                    <input type="number" id="age" required min="0" max="120">
+                </div>
+
+                <div class="form-group">
+                    <label for="heartRate">Heart Rate (BPM) (ex : 75)</label>
+                    <input type="number" id="heartRate" required min="30" max="220">
+                </div>
+
+                <div class="form-group">
+                    <label for="spO2">SpO₂ (Oxygen Saturation, ex: 95)</label>
+                    <input type="range" id="spO2" min="85" max="100" step="1" >
+                    <span class="range-value"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="muscleStiffness">Muscle Stiffness (0-10)</label>
+                    <input type="range" id="muscleStiffness" min="0" max="10" step="0.1">
+                    <span class="range-value"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="caloriesBurnt">Calories Burnt (per day)</label>
+                    <input type="range" id="caloriesBurnt" min="300" max="3000" step="50">
+                    <span class="range-value"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="sleep">Average Sleep (in hours)</label>
+                    <input type="number" id="sleep" required min="0" max="24">
+                </div>
+
+                <div class="form-group">
+                    <label for="stepCount">Daily Step Count</label>
+                    <input type="number" id="stepCount" required min="0" max="100000">
+                </div>
+
+                <button type="submit" class="button">Submit Assessment</button>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="section">
+
+                <div class="reference-chart">
+                    <h3>Reference Parameters</h3>
+                    <table class="parameters-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Healthy Person</th>
+                                <th>Person with Parkinson's Disease</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Heart Rate (BPM)</td>
+                                <td>60-100 BPM (resting)</td>
+                                <td>70-110 BPM (due to autonomic dysfunction)</td>
+                            </tr>
+                            <tr>
+                                <td>Sleep Hours</td>
+                                <td>6-8 hours</td>
+                                <td>4-6 hours (insomnia, REM sleep disturbances)</td>
+                            </tr>
+                            <tr>
+                                <td>SpO₂ (Oxygen Saturation, %)</td>
+                                <td>95-100%</td>
+                                <td>90-98% (can drop in late stages due to respiratory issues)</td>
+                            </tr>
+                            <tr>
+                                <td>Muscle Stiffness</td>
+                                <td>No stiffness</td>
+                                <td>Moderate to severe rigidity, affecting movement</td>
+                            </tr>
+                            <tr>
+                                <td>Calories Burnt (per day)</td>
+                                <td>2,000-2,800 kcal (varies by activity level)</td>
+                                <td>1,500-2,300 kcal (lower due to reduced movement)</td>
+                            </tr>
+                            <tr>
+                                <td>Step Count (per day)</td>
+                                <td>7,000-10,000+ steps</td>
+                                <td>2,000-6,000 steps (varies by stage and mobility)</td>
+                            </tr>
+                            <tr>
+                                <td>Age of Onset</td>
+                                <td>Any age</td>
+                                <td>Typically 55-70 years, early-onset: 40-55 years</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            <button onclick="goBack()" class="back-button">← Back</button>
+            <h2>Assessment Results</h2>
+            <div class="results-container">
+                <div class="prediction-display">
+                    <h3>Parkinson's Disease Risk</h3>
+                    <div id="predictionValue" class="prediction-value">--.--%</div>
+                    <div id="severityLevel" class="severity-level"></div>
+                </div>
+
+                <div class="recommendations">
+                    <h3>Recommendations</h3>
+                    <ul id="recommendationsList"></ul>
+                </div>
+
+                <div class="assessment-date">
+                    Assessment Date: <span id="assessmentDate"></span>
+                </div>
+
+                <button onclick="downloadReport()" class="button">
+                    <span class="icon">📥</span>
+                    Download Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
