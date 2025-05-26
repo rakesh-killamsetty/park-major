@@ -337,33 +337,29 @@ async function analyzeAudio(audioBlob) {
       .map(li => li.textContent);
     const date = document.getElementById('assessmentDate').textContent;
   
-    const content = `
-      Parkinson's Disease Assessment Report
-  
-      Date: ${date}
-  
-      Risk Assessment
-      ------------------------------
-      Prediction: ${prediction}%
-      Severity Level: ${severity}
-  
-      Recommendations
-      ------------------------------
-      ${recommendations.join('\n')}
-  
-      Note: This assessment is for screening purposes only and should not be considered as a medical diagnosis. 
-      Please consult with a healthcare professional for proper medical evaluation.
-    `;
-  
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `parkinsons-assessment-${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    // Use jsPDF global if available
+    const doc = typeof jsPDF !== 'undefined' ? new jsPDF() : new window.jspdf.jsPDF();
+    doc.setFontSize(16);
+    doc.text("Parkinson's Disease Assessment Report", 10, 20);
+    doc.setFontSize(12);
+    doc.text(`Date: ${date}`, 10, 35);
+    doc.text('Risk Assessment', 10, 50);
+    doc.line(10, 52, 200, 52);
+    doc.text(`Prediction: ${prediction}%`, 10, 60);
+    doc.text(`Severity Level: ${severity}`, 10, 70);
+    doc.text('Recommendations', 10, 85);
+    doc.line(10, 87, 200, 87);
+    let y = 95;
+    recommendations.forEach(rec => {
+      doc.text(`- ${rec}`, 10, y);
+      y += 10;
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+    });
+    doc.text('Note: This assessment is for screening purposes only and should not be considered as a medical diagnosis. Please consult with a healthcare professional for proper medical evaluation.', 10, y + 10, { maxWidth: 190 });
+    doc.save(`parkinsons-assessment-${new Date().toISOString().split('T')[0]}.pdf`);
   }
   
   // Initialize the application
