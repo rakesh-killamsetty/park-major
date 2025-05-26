@@ -127,7 +127,7 @@ async function analyzeAudio(audioBlob) {
             "Exercise: Physical therapy + daily walking, stretching, balance exercises, tai chi",
             "Diet: High-protein meals timed correctly (protein can interfere with some medications)",
             "Sleep: Improve sleep hygiene, use weighted blankets, and consider melatonin if needed",
-            "Medication: Start Parkinson’s meds as prescribed, monitor for side effects",
+            "Medication: Start Parkinson's meds as prescribed, monitor for side effects",
             "Fall Prevention: Use handrails, non-slip mats, and supportive shoes",
             "Cognitive Health: Engage in brain-stimulating activities (reading, puzzles, learning new skills)",
         "Note: This assessment is for screening purposes only and should not be considered a medical diagnosis.Please consult with a healthcare professional for proper medical evaluation."
@@ -156,10 +156,23 @@ async function analyzeAudio(audioBlob) {
   
   // Navigation functions
   function showSection(sectionId) {
+    // Update navigation active states
+    document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('onclick').includes(sectionId)) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+
+    // Update section visibility
     document.querySelectorAll('.section').forEach(section => {
-      section.classList.remove('active');
+        section.classList.remove('active');
     });
     document.getElementById(sectionId).classList.add('active');
+
+    // Scroll to top when changing sections
+    window.scrollTo(0, 0);
   }
   
   function goBack() {
