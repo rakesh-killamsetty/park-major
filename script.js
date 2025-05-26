@@ -331,39 +331,130 @@ async function analyzeAudio(audioBlob) {
   
   // Report generation
   function downloadReport() {
-    const prediction = parseFloat(document.getElementById('predictionValue').textContent);
-    const severity = document.getElementById('severityLevel').textContent;
-    const recommendations = Array.from(document.getElementById('recommendationsList').children)
-      .map(li => li.textContent);
-    const date = document.getElementById('assessmentDate').textContent;
-  
-    const content = `
-      Parkinson's Disease Assessment Report
-  
-      Date: ${date}
-  
-      Risk Assessment
-      ------------------------------
-      Prediction: ${prediction}%
-      Severity Level: ${severity}
-  
-      Recommendations
-      ------------------------------
-      ${recommendations.join('\n')}
-  
-      Note: This assessment is for screening purposes only and should not be considered as a medical diagnosis. 
-      Please consult with a healthcare professional for proper medical evaluation.
-    `;
-  
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `parkinsons-assessment-${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    try {
+        const prediction = parseFloat(document.getElementById('predictionValue').textContent);
+        const severity = document.getElementById('severityLevel').textContent;
+        const recommendations = Array.from(document.getElementById('recommendationsList').children)
+            .map(li => li.textContent);
+        const date = document.getElementById('assessmentDate').textContent;
+        const reportId = `PD${Date.now().toString().slice(-6)}`;
+
+        // Create new jsPDF instance
+        const doc = new jspdf.jsPDF();
+        
+        // Header with logo and clinic info
+        doc.setFillColor(41, 128, 185);
+        doc.rect(0, 0, 220, 40, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.text("Parkinson's Disease Assessment Center", 20, 20);
+        doc.setFontSize(10);
+        doc.text("Advanced Neurological Assessment Division", 20, 30);
+        
+        // Report Info Box
+        doc.setDrawColor(41, 128, 185);
+        doc.setLineWidth(0.5);
+        doc.rect(20, 45, 170, 35);
+        
+        doc.setTextColor(0, 0, 0);
+        doc.text("DIAGNOSTIC ASSESSMENT REPORT", 70, 55);
+        doc.setFontSize(10);
+        doc.text(`Report Date: ${date}`, 25, 65);
+        doc.text(`Report ID: ${reportId}`, 120, 65);
+        doc.text("Assessment Type: Combined Analysis (Voice & Health Metrics)", 25, 75);
+
+        // Risk Assessment Section
+        doc.setFillColor(240, 240, 240);
+        doc.rect(20, 85, 170, 45, 'F');
+        
+        doc.setFontSize(14);
+        doc.setTextColor(41, 128, 185);
+        doc.text("RISK ASSESSMENT RESULTS", 25, 95);
+        
+        // Risk level indicator
+        let riskColor;
+        if (severity === 'Low Risk') {
+            riskColor = [46, 204, 113];
+        } else if (severity === 'Moderate Risk') {
+            riskColor = [243, 156, 18];
+        } else {
+            riskColor = [231, 76, 60];
+        }
+        
+        doc.setFillColor(riskColor[0], riskColor[1], riskColor[2]);
+        doc.rect(25, 100, 160, 25, 'F');
+        
+        doc.setFontSize(12);
+        doc.setTextColor(255, 255, 255);
+        doc.text(`Risk Classification: ${severity}`, 30, 110);
+        doc.text(`Assessment Score: ${prediction}%`, 30, 120);
+
+        // Recommendations Section
+        doc.setFontSize(14);
+        doc.setTextColor(41, 128, 185);
+        doc.text("CLINICAL RECOMMENDATIONS", 25, 145);
+        
+        // Add recommendations with category headers
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        let y = 155;
+        
+        recommendations.forEach((rec, index) => {
+            if (y > 250) {
+                doc.addPage();
+                y = 20;
+                // Add header to new page
+                doc.setTextColor(41, 128, 185);
+                doc.text("CLINICAL RECOMMENDATIONS (continued)", 25, y);
+                doc.setTextColor(0, 0, 0);
+                y += 15;
+            }
+            
+            // Add alternating background for better readability
+            if (index % 2 === 0) {
+                doc.setFillColor(245, 245, 245);
+                doc.rect(25, y - 5, 160, 12, 'F');
+            }
+            
+            const lines = doc.splitTextToSize(rec, 150);
+            lines.forEach(line => {
+                doc.text("•", 25, y);
+                doc.text(line, 30, y);
+                y += 6;
+            });
+            y += 4;
+        });
+
+        // Footer with disclaimer
+        doc.setFontSize(9);
+        doc.setTextColor(128, 128, 128);
+        const disclaimer = "DISCLAIMER: This assessment is for screening purposes only and should not be considered as a definitive medical diagnosis. The results should be reviewed by a qualified healthcare professional in conjunction with other clinical findings.";
+        
+        // Add footer to each page
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            // Add footer background
+            doc.setFillColor(245, 245, 245);
+            doc.rect(0, 275, 220, 25, 'F');
+            
+            const disclaimerLines = doc.splitTextToSize(disclaimer, 180);
+            doc.text(disclaimerLines, 15, 283);
+            doc.text(`Page ${i} of ${pageCount}`, 185, 292);
+            
+            // Add vertical line on left margin
+            doc.setDrawColor(41, 128, 185);
+            doc.setLineWidth(3);
+            doc.line(10, 40, 10, 275);
+        }
+
+        // Save the PDF
+        doc.save(`PD-Assessment-${reportId}.pdf`);
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        alert('There was an error generating the PDF. Please try again.');
+    }
   }
   
   // Initialize the application
